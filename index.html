@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Pad Studio — Chord Pad & Drum Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-moz-text-size-adjust:none;-webkit-text-size-adjust:none;text-size-adjust:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;scroll-behavior:smooth;hanging-punctuation:first last;scroll-padding-top:var(--space-16)}
+body{min-height:100dvh;line-height:1.6;font-family:var(--font-body,sans-serif);font-size:var(--text-base);color:var(--color-text);background-color:var(--color-bg)}
+img,picture,video,canvas,svg{display:block;max-width:100%;height:auto}
+ul[role='list'],ol[role='list']{list-style:none}
+input,button,textarea,select{font:inherit;color:inherit}
+h1,h2,h3,h4,h5,h6{text-wrap:balance;line-height:1.15}
+p,li,figcaption{text-wrap:pretty;max-width:72ch}
+::selection{background:oklch(from var(--color-primary) l c h / 0.25);color:var(--color-text)}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}}
+button{cursor:pointer;background:none;border:none}
+table{border-collapse:collapse;width:100%}
+a,button,[role='button'],[role='link'],input,textarea,select{transition:color var(--transition-interactive),background var(--transition-interactive),border-color var(--transition-interactive),box-shadow var(--transition-interactive)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+
+/* ============================================
+   Practice Pad Studio — Dark Studio Aesthetic
+   Deep charcoal surfaces, amber/orange accents
+   ============================================ */
+
+:root,
+[data-theme='dark'] {
+  /* Surfaces */
+  --color-bg: #0d0c0a;
+  --color-surface: #161513;
+  --color-surface-2: #1c1b18;
+  --color-surface-offset: #211f1b;
+  --color-surface-dynamic: #2a2823;
+  --color-divider: #2a2823;
+  --color-border: #34322c;
+  --color-border-light: #3d3a33;
+
+  /* Text */
+  --color-text: #e8e4dc;
+  --color-text-muted: #8a857a;
+  --color-text-faint: #5c584e;
+  --color-text-inverse: #1a1916;
+
+  /* Accents — Amber/Orange (warm studio tone) */
+  --color-primary: #e8923c;
+  --color-primary-hover: #f0a04a;
+  --color-primary-active: #d47e28;
+  --color-primary-highlight: #3a2e1c;
+  --color-accent-2: #c95f3a;
+  --color-kick: #e85d3a;
+  --color-snare: #e8c83c;
+  --color-hat: #3cb4e8;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(232,146,60,0.15);
+
+  /* Fonts */
+  --font-display: 'Clash Display', 'Inter', sans-serif;
+  --font-body: 'General Sans', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Type Scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+}
+
+[data-theme='light'] {
+  --color-bg: #f5f2ec;
+  --color-surface: #faf8f4;
+  --color-surface-2: #f0ede7;
+  --color-surface-offset: #ebe7df;
+  --color-surface-dynamic: #e0ddd5;
+  --color-divider: #d8d4cc;
+  --color-border: #c8c4ba;
+  --color-border-light: #b8b3a8;
+  --color-text: #1a1916;
+  --color-text-muted: #6a655a;
+  --color-text-faint: #9a958a;
+  --color-text-inverse: #f5f2ec;
+  --color-primary: #c66e1a;
+  --color-primary-hover: #a85e14;
+  --color-primary-active: #8a4e0e;
+  --color-primary-highlight: #f0e0c8;
+  --color-accent-2: #b54a2a;
+  --color-kick: #c44a2a;
+  --color-snare: #b88a1a;
+  --color-hat: #1a7aa8;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
+  --shadow-glow: 0 0 20px rgba(198,110,26,0.1);
+}
+
+/* ============================================
+   Layout
+   ============================================ */
+
+body {
+  background: var(--color-bg);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,146,60,0.06), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(201,95,58,0.04), transparent);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.theme-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+/* Main */
+.app-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Panels */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.panel-header h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   Transport Panel
+   ============================================ */
+
+.transport-panel {
+  padding: var(--space-4) var(--space-5);
+}
+
+.transport-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.btn-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  flex-shrink: 0;
+}
+
+.btn-play:hover {
+  background: var(--color-primary-hover);
+  transform: scale(1.05);
+}
+
+.btn-play:active {
+  transform: scale(0.95);
+}
+
+.btn-play.playing {
+  background: var(--color-accent-2);
+}
+
+.bpm-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.label-sm {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+.bpm-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.bpm-number {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.bpm-unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.timesig-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--color-divider);
+}
+
+.timesig-control .chord-pick {
+  min-width: 60px;
+  min-height: 36px;
+  padding: var(--space-1) var(--space-2);
+}
+
+.beat-indicator {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.beat-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-dynamic);
+  border: 1px solid var(--color-border);
+  transition: all 150ms ease;
+}
+
+.beat-dot.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px rgba(232,146,60,0.5);
+}
+
+/* ============================================
+   Workspace (Pad + Sequencer)
+   ============================================ */
+
+.workspace {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .workspace {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .pad-panel { grid-column: span 3; }
+  .sequencer-panel { grid-column: span 3; }
+  .mixer-panel { grid-column: span 2; }
+  .cof-panel { grid-column: span 2; }
+  .nashville-panel { grid-column: span 2; }
+}
+
+/* ============================================
+   Pad Synth Panel
+   ============================================ */
+
+.pad-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pad-visual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-divider);
+  transition: all 200ms ease;
+}
+
+@media (min-width: 480px) {
+  .pad-visual {
+    flex-direction: row;
+    align-items: center;
+  }
+  .chord-display {
+    flex: 1;
+  }
+}
+
+.pad-visual.active {
+  background: radial-gradient(circle at left, rgba(232,146,60,0.15), var(--color-surface-2));
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.chord-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.chord-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.chord-notes {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ADSR Controls */
+.adsr-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 480px) {
+  .adsr-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--space-4);
+  }
+}
+
+.adsr-knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.adsr-knob .label-sm {
+  text-align: center;
+}
+
+.param-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  min-height: 1em;
+}
+
+/* Continuous pad toggle */
+.continuous-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+.continuous-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.continuous-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: var(--color-surface-dynamic);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: all 200ms ease;
+}
+
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  top: 2px;
+  background: var(--color-text-muted);
+  border-radius: 50%;
+  transition: all 200ms ease;
+}
+
+.switch input:checked + .switch-slider {
+  background: var(--color-primary-highlight);
+  border-color: var(--color-primary);
+}
+
+.switch input:checked + .switch-slider::before {
+  transform: translateX(18px);
+  background: var(--color-primary);
+}
+
+/* Sliders */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-dynamic);
+  outline: none;
+}
+
+/* Vertical fader (mixer channel strips) — writing-mode avoids the layout
+   overflow bugs that transform:rotate() based vertical sliders can cause */
+.fader-vertical {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 8px;
+  height: 130px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-dynamic);
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb,
+.fader-vertical::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 2px solid var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.slider::-moz-range-thumb,
+.fader-vertical::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 2px solid var(--color-surface);
+}
+
+.slider:focus-visible::-webkit-slider-thumb,
+.fader-vertical:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Chord Selector — custom tappable buttons + modal picker */
+.chord-selector-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+@media (min-width: 480px) {
+  .chord-selector-wrap {
+    flex: 1.1;
+    padding-top: 0;
+    padding-left: var(--space-4);
+    border-top: none;
+    border-left: 1px solid var(--color-divider);
+  }
+}
+
+.chord-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 1 90px;
+}
+
+.chord-pick {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  min-height: 44px;
+  min-width: 80px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  position: relative;
+}
+
+.chord-pick::after {
+  content: '\25BC';
+  font-size: 8px;
+  margin-left: var(--space-1);
+  opacity: 0.5;
+}
+
+.chord-pick:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface-offset);
+}
+
+.chord-pick:active {
+  transform: scale(0.96);
+}
+
+.chord-pick.open {
+  border-color: var(--color-primary);
+  background: var(--color-primary-highlight);
+}
+
+/* Octave stepper */
+.octave-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  padding: 0 var(--space-1);
+}
+
+.octave-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.octave-btn:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: var(--color-surface-offset);
+}
+
+.octave-btn:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.octave-btn:disabled {
+  color: var(--color-text-faint);
+  cursor: not-allowed;
+}
+
+.octave-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  min-width: 16px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+/* Modal overlay for picker */
+.picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn 150ms ease;
+}
+
+.picker-overlay.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.picker-modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 420px;
+  width: 100%;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: var(--space-4);
+  padding-bottom: var(--space-6);
+}
+
+.picker-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.picker-group-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.picker-group-label:first-child {
+  margin-top: 0;
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.picker-option:hover {
+  border-color: var(--color-primary);
+}
+
+.picker-option:active {
+  transform: scale(0.96);
+}
+
+.picker-option.selected {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+  font-weight: 700;
+}
+
+.picker-close {
+  width: 100%;
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.picker-close:hover {
+  border-color: var(--color-primary);
+}
+
+/* ============================================
+   Drum Sequencer
+   ============================================ */
+
+.sequencer-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.seq-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ============================================
+   Mixer Panel
+   ============================================ */
+
+.mixer-strips {
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.channel-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100px;
+}
+
+.channel-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.fader-row {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) 0;
+}
+
+.fader-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.pan-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.pan-side-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  flex-shrink: 0;
+}
+
+.pan-slider {
+  flex: 1;
+}
+
+.pan-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.btn-small {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+}
+
+.btn-small:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.sequencer-grid {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.seq-row {
+  --seq-label-width: 80px;
+  display: grid;
+  grid-template-columns: var(--seq-label-width) repeat(16, minmax(0, 1fr));
+  gap: 3px;
+  align-items: center;
+}
+
+.seq-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+  padding-right: var(--space-2);
+}
+
+.seq-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-divider);
+  cursor: pointer;
+  transition: all 100ms ease;
+  min-height: 28px;
+}
+
+.seq-cell:hover {
+  border-color: var(--color-border-light);
+}
+
+.seq-cell.beat-start {
+  border-left: 2px solid var(--color-border);
+}
+
+.seq-cell.active.kick {
+  background: var(--color-kick);
+  border-color: var(--color-kick);
+}
+
+.seq-cell.active.snare {
+  background: var(--color-snare);
+  border-color: var(--color-snare);
+}
+
+.seq-cell.active.hat {
+  background: var(--color-hat);
+  border-color: var(--color-hat);
+}
+
+.seq-cell.current {
+  box-shadow: 0 0 0 2px var(--color-primary);
+  z-index: 1;
+}
+
+.seq-legend {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+}
+
+.dot-kick { background: var(--color-kick); }
+.dot-snare { background: var(--color-snare); }
+.dot-hat { background: var(--color-hat); }
+
+/* ============================================
+   Circle of Fifths Panel
+   ============================================ */
+
+.cof-wheel-wrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0;
+}
+
+.cof-wheel {
+  width: 100%;
+  max-width: 280px;
+}
+
+.cof-wheel svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cof-note {
+  cursor: pointer;
+}
+
+.cof-note circle {
+  fill: var(--color-surface-2);
+  stroke: var(--color-border);
+  stroke-width: 1;
+  transition: all 150ms ease;
+}
+
+.cof-note text {
+  fill: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  transition: fill 150ms ease;
+}
+
+.cof-minor circle {
+  fill: var(--color-surface);
+}
+
+.cof-minor text {
+  font-size: 9px;
+  font-weight: 500;
+  fill: var(--color-text-faint);
+}
+
+.cof-note:hover circle {
+  stroke: var(--color-border-light);
+}
+
+.cof-note.selected circle {
+  fill: var(--color-primary-highlight);
+  stroke: var(--color-primary);
+  stroke-width: 2;
+}
+
+.cof-note.selected text {
+  fill: var(--color-primary);
+}
+
+/* ============================================
+   Nashville Numbers Panel
+   ============================================ */
+
+.nashville-hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.nashville-hint span {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nashville-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (max-width: 420px) {
+  .nashville-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.nashville-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-1);
+  min-height: 60px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+}
+
+.nashville-chip:hover {
+  border-color: var(--color-border-light);
+}
+
+.nashville-chip.selected {
+  background: var(--color-primary-highlight);
+  border-color: var(--color-primary);
+}
+
+.nashville-number {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.nashville-chord-name {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.nashville-chip.selected .nashville-chord-name {
+  color: var(--color-text);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 600px) {
+  .app-main {
+    padding: var(--space-4);
+  }
+  .transport-controls {
+    gap: var(--space-3);
+  }
+  .bpm-number {
+    font-size: var(--text-base);
+  }
+  .seq-row {
+    --seq-label-width: 56px;
+    gap: 2px;
+  }
+  .seq-label {
+    font-size: 10px;
+  }
+  .seq-cell {
+    min-height: 22px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="header-left">
+    <svg class="logo" viewBox="0 0 32 32" fill="none" aria-label="Practice Pad Studio logo">
+      <rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor" opacity="0.9"/>
+      <rect x="18" y="3" width="11" height="6" rx="2" fill="currentColor" opacity="0.6"/>
+      <rect x="3" y="18" width="6" height="11" rx="2" fill="currentColor" opacity="0.6"/>
+      <rect x="12" y="18" width="17" height="11" rx="2" fill="currentColor" opacity="0.9"/>
+    </svg>
+    <div>
+      <h1>Practice Pad Studio</h1>
+      <p class="subtitle">Chord Pad &amp; Drum Machine</p>
+    </div>
+  </div>
+  <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</header>
+
+<main class="app-main">
+
+  <!-- Transport Bar -->
+  <section class="panel transport-panel">
+    <div class="transport-controls">
+      <button id="playBtn" class="btn-play" aria-label="Play/Stop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon-play"><path d="M8 5v14l11-7z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon-stop" style="display:none"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+      </button>
+      <div class="bpm-control">
+        <label for="bpmSlider" class="label-sm">Tempo</label>
+        <div class="bpm-display">
+          <span id="bpmValue" class="bpm-number">110</span>
+          <span class="bpm-unit">BPM</span>
+        </div>
+        <input type="range" id="bpmSlider" min="60" max="220" value="110" step="1" class="slider" aria-label="Tempo BPM">
+      </div>
+      <div class="timesig-control">
+        <span class="label-sm">Time Sig</span>
+        <button id="timeSigBtn" class="chord-pick" type="button">4/4</button>
+      </div>
+      <div class="beat-indicator" id="beatIndicator"><!-- Generated by JS --></div>
+    </div>
+  </section>
+
+  <!-- Two Column Layout: Pad + Sequencer -->
+  <div class="workspace">
+    
+    <!-- Left: Pad Synth Panel -->
+    <section class="panel pad-panel">
+      <div class="panel-header">
+        <h2>Pad Synth</h2>
+      </div>
+      <div class="pad-visual" id="padVisual">
+        <div class="chord-display">
+          <span class="chord-name" id="chordNameDisplay">C</span>
+          <span class="chord-notes" id="chordNotesDisplay">C &middot; E &middot; G</span>
+        </div>
+        <div class="chord-selector-wrap">
+          <div class="chord-select-group">
+            <span class="label-sm">Key</span>
+            <button id="rootBtn" class="chord-pick" type="button">C</button>
+          </div>
+          <div class="chord-select-group">
+            <span class="label-sm">Chord</span>
+            <button id="typeBtn" class="chord-pick" type="button">Major</button>
+          </div>
+          <div class="chord-select-group">
+            <span class="label-sm">Sound</span>
+            <button id="soundBtn" class="chord-pick" type="button">Analog Strings</button>
+          </div>
+          <div class="chord-select-group">
+            <span class="label-sm">Octave</span>
+            <div class="octave-stepper">
+              <button id="octaveDown" class="octave-btn" type="button" aria-label="Decrease octave">&minus;</button>
+              <span class="octave-value" id="octaveValue">3</span>
+              <button id="octaveUp" class="octave-btn" type="button" aria-label="Increase octave">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="adsr-controls">
+        <div class="adsr-knob">
+          <label for="attackSlider" class="label-sm">Attack</label>
+          <input type="range" id="attackSlider" min="0" max="2" step="0.01" value="0.3" class="slider slider-vertical" aria-label="Attack time">
+          <span class="param-value" id="attackValue">0.30s</span>
+        </div>
+        <div class="adsr-knob">
+          <label for="decaySlider" class="label-sm">Decay</label>
+          <input type="range" id="decaySlider" min="0" max="2" step="0.01" value="0.5" class="slider slider-vertical" aria-label="Decay time">
+          <span class="param-value" id="decayValue">0.50s</span>
+        </div>
+        <div class="adsr-knob">
+          <label for="releaseSlider" class="label-sm">Release</label>
+          <input type="range" id="releaseSlider" min="0" max="4" step="0.01" value="1.0" class="slider slider-vertical" aria-label="Release time">
+          <span class="param-value" id="releaseValue">1.00s</span>
+        </div>
+        <div class="adsr-knob">
+          <label for="cutoffSlider" class="label-sm">Cutoff</label>
+          <input type="range" id="cutoffSlider" min="200" max="8000" step="50" value="2000" class="slider" aria-label="Filter cutoff">
+          <span class="param-value" id="cutoffValue">2000Hz</span>
+        </div>
+      </div>
+      <div class="continuous-row">
+        <label class="switch">
+          <input type="checkbox" id="continuousToggle">
+          <span class="switch-slider"></span>
+        </label>
+        <div class="continuous-label">
+          <span class="label-sm">Continuous Pad</span>
+          <span class="continuous-hint">Hold the chord as a sustained drone instead of retriggering each bar</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Drum Sequencer -->
+    <section class="panel sequencer-panel">
+      <div class="panel-header">
+        <h2>Drum Sequencer</h2>
+        <div class="seq-actions">
+          <button id="clearBtn" class="btn-small">Clear</button>
+          <button id="resetBtn" class="btn-small">Default</button>
+        </div>
+      </div>
+      <div class="sequencer-grid" id="sequencerGrid">
+        <!-- Generated by JS -->
+      </div>
+      <div class="seq-legend">
+        <span class="legend-item"><span class="dot dot-kick"></span>Kick</span>
+        <span class="legend-item"><span class="dot dot-snare"></span>Snare</span>
+        <span class="legend-item"><span class="dot dot-hat"></span>Hi-Hat</span>
+      </div>
+    </section>
+
+    <!-- Mixer: volume + pan for Pad and Drums -->
+    <section class="panel mixer-panel">
+      <div class="panel-header">
+        <h2>Mixer</h2>
+      </div>
+      <div class="mixer-strips">
+        <div class="channel-strip">
+          <span class="channel-label">Pad</span>
+          <div class="fader-row">
+            <input type="range" id="padVolFader" min="0" max="1" step="0.01" value="0.6" class="fader-vertical" aria-label="Pad volume" orient="vertical">
+          </div>
+          <span class="fader-value" id="padVolFaderValue">60%</span>
+          <div class="pan-row">
+            <span class="pan-side-label">L</span>
+            <input type="range" id="padPanSlider" min="-1" max="1" step="0.01" value="0" class="slider pan-slider" aria-label="Pad pan">
+            <span class="pan-side-label">R</span>
+          </div>
+          <span class="pan-value" id="padPanValue">C</span>
+        </div>
+        <div class="channel-strip">
+          <span class="channel-label">Drums</span>
+          <div class="fader-row">
+            <input type="range" id="drumVolFader" min="0" max="1" step="0.01" value="0.8" class="fader-vertical" aria-label="Drum volume" orient="vertical">
+          </div>
+          <span class="fader-value" id="drumVolFaderValue">80%</span>
+          <div class="pan-row">
+            <span class="pan-side-label">L</span>
+            <input type="range" id="drumPanSlider" min="-1" max="1" step="0.01" value="0" class="slider pan-slider" aria-label="Drum pan">
+            <span class="pan-side-label">R</span>
+          </div>
+          <span class="pan-value" id="drumPanValue">C</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Circle of Fifths: tap a key to change the current key -->
+    <section class="panel cof-panel">
+      <div class="panel-header">
+        <h2>Circle of Fifths</h2>
+      </div>
+      <div class="cof-wheel-wrap">
+        <div class="cof-wheel" id="cofWheel"><!-- Generated by JS --></div>
+      </div>
+    </section>
+
+    <!-- Nashville Number System: tap a scale degree to change the chord -->
+    <section class="panel nashville-panel">
+      <div class="panel-header">
+        <h2>Nashville Numbers</h2>
+      </div>
+      <p class="nashville-hint">Diatonic chords in the key of <span id="nashvilleKeyLabel">C</span> major</p>
+      <div class="nashville-grid" id="nashvilleGrid"><!-- Generated by JS --></div>
+    </section>
+  </div>
+
+</main>
+
+<script>
+/* ============================================
+   Practice Pad Studio — Audio Engine
+   Web Audio API: pad synth, drum machine, export
+   ============================================ */
+
+// ---- Note frequency table (A4 = 440 Hz) ----
+const NOTE_FREQS = {};
+(() => {
+  const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  // A4 = 440 Hz, MIDI note 69
+  for (let midi = 36; midi <= 96; midi++) {
+    const noteIdx = midi % 12;
+    const octave = Math.floor(midi / 12) - 1;
+    const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const name = notes[noteIdx] + octave;
+    NOTE_FREQS[name] = { freq, midi };
+  }
+})();
+
+// ---- Chord definitions ----
+// Semitone offsets from root, plus root note class
+const CHORD_TYPES = {
+  '':      { name: 'maj',    intervals: [0, 4, 7] },
+  'm':     { name: 'min',    intervals: [0, 3, 7] },
+  '6':     { name: '6',      intervals: [0, 4, 7, 9] },
+  'm6':    { name: 'm6',     intervals: [0, 3, 7, 9] },
+  '7':     { name: '7',      intervals: [0, 4, 7, 10] },
+  'maj7':  { name: 'maj7',   intervals: [0, 4, 7, 11] },
+  'm7':    { name: 'm7',     intervals: [0, 3, 7, 10] },
+  '7b5':   { name: '7b5',    intervals: [0, 4, 6, 10] },
+  '7#5':   { name: '7#5',    intervals: [0, 4, 8, 10] },
+  '9':     { name: '9',      intervals: [0, 4, 7, 10, 14] },
+  'maj9':  { name: 'maj9',   intervals: [0, 4, 7, 11, 14] },
+  'm9':    { name: 'm9',     intervals: [0, 3, 7, 10, 14] },
+  '7b9':   { name: '7b9',    intervals: [0, 4, 7, 10, 13] },
+  '7#9':   { name: '7#9',    intervals: [0, 4, 7, 10, 15] },
+  '6/9':   { name: '6/9',    intervals: [0, 4, 7, 9, 14] },
+  '11':    { name: '11',     intervals: [0, 4, 7, 10, 14, 17] },
+  'm11':   { name: 'm11',    intervals: [0, 3, 7, 10, 14, 17] },
+  '13':    { name: '13',     intervals: [0, 4, 7, 10, 14, 21] },
+  'm13':   { name: 'm13',    intervals: [0, 3, 7, 10, 14, 21] },
+  'add9':  { name: 'add9',   intervals: [0, 4, 7, 14] },
+  'madd9': { name: 'madd9',  intervals: [0, 3, 7, 14] },
+  'sus4':  { name: 'sus4',   intervals: [0, 5, 7] },
+  'sus2':  { name: 'sus2',   intervals: [0, 2, 7] },
+  'dim':   { name: 'dim',    intervals: [0, 3, 6] },
+  'dim7':  { name: 'dim7',   intervals: [0, 3, 6, 9] },
+  'aug':   { name: 'aug',    intervals: [0, 4, 8] },
+  'aug7':  { name: 'aug7',   intervals: [0, 4, 8, 10] },
+};
+
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const NOTE_NAMES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+// Formats a -1..1 pan value as "C", "35% L", "80% R", etc.
+function formatPan(v) {
+  if (Math.abs(v) < 0.03) return 'C';
+  const pct = Math.round(Math.abs(v) * 100);
+  return `${pct}% ${v < 0 ? 'L' : 'R'}`;
+}
+
+// ---- Time signatures ----
+// All durations are expressed in 16th-note "steps" so tempo (quarter-note
+// BPM) stays meaningful across meters. Simple meters (4/4, 3/4, 5/4) use
+// 4 steps per beat; compound meters (6/8, 7/8) pulse on the eighth note,
+// so 2 steps per beat, with `beats` counting those eighth-note pulses.
+const TIME_SIGNATURES = {
+  '4/4': { label: '4/4', beats: 4, stepsPerBeat: 4 },
+  '3/4': { label: '3/4', beats: 3, stepsPerBeat: 4 },
+  '5/4': { label: '5/4', beats: 5, stepsPerBeat: 4 },
+  '6/8': { label: '6/8', beats: 6, stepsPerBeat: 2 },
+  '7/8': { label: '7/8', beats: 7, stepsPerBeat: 2 },
+};
+function getTimeSig() {
+  const sig = TIME_SIGNATURES[state.timeSig] || TIME_SIGNATURES['4/4'];
+  return { ...sig, steps: sig.beats * sig.stepsPerBeat };
+}
+
+// Generic default pattern for any time signature: kick on beat 1 and the
+// midpoint beat, snare on alternating beats, hat on a steady subdivision
+function generateDefaultPattern(sig) {
+  const { steps, beats, stepsPerBeat } = sig;
+  const kick = Array(steps).fill(0);
+  const snare = Array(steps).fill(0);
+  const hat = Array(steps).fill(0);
+  kick[0] = 1;
+  kick[Math.floor(beats / 2) * stepsPerBeat] = 1;
+  for (let b = 1; b < beats; b += 2) {
+    snare[b * stepsPerBeat] = 1;
+  }
+  const hatInterval = stepsPerBeat >= 2 ? Math.floor(stepsPerBeat / 2) : 1;
+  for (let s = 0; s < steps; s += hatInterval) {
+    hat[s] = 1;
+  }
+  return { kick, snare, hat };
+}
+// Each preset controls oscillator waveform per voice + detune spread,
+// giving a distinct timbre while reusing the same ADSR/filter engine.
+const PAD_SOUNDS = {
+  strings: {
+    label: 'Analog Strings',
+    detune: [-9, -4, -1, 4, 9],
+    typeFor: () => 'sawtooth',
+    gainFor: i => (i === 2 ? 0.28 : 0.16),
+  },
+  organ: {
+    // Drawbar-style stack: sub-octave, unison, fifth, octave, octave+fifth
+    // (detune in cents lets us fake harmonic ratios: 1200 = octave, 700 = fifth)
+    label: 'Organ',
+    detune: [-1200, 0, 700, 1200, 1902],
+    typeFor: () => 'sine',
+    gainFor: i => [0.16, 0.3, 0.12, 0.22, 0.1][i],
+  },
+  piano: {
+    // Softer triangle stack with tight detune, mimicking a piano's
+    // slightly-detuned unison strings rather than a bright synth lead
+    label: 'Piano',
+    detune: [-6, -2, 0, 2, 6],
+    typeFor: i => (i === 2 ? 'triangle' : 'sine'),
+    gainFor: i => (i === 2 ? 0.3 : 0.14),
+  },
+};
+
+function parseChord(chordStr, rootOctave = 3) {
+  // Parse root + type: e.g. "Gm", "C#7", "F#maj7", "Gsus4"
+  let root, type;
+  if (chordStr[1] === '#' || chordStr[1] === 'b') {
+    root = chordStr.substring(0, 2);
+    type = chordStr.substring(2);
+  } else {
+    root = chordStr[0];
+    type = chordStr.substring(1);
+  }
+  const rootIdx = NOTE_NAMES.indexOf(root);
+  const chordType = CHORD_TYPES[type] || CHORD_TYPES[''];
+  // Build notes starting at the chosen root octave (e.g. rootOctave 3 => C3 = 48)
+  const baseMidi = (rootOctave + 1) * 12 + rootIdx;
+  const notes = chordType.intervals.map(interval => {
+    const midi = baseMidi + interval;
+    const noteIdx = midi % 12;
+    const octave = Math.floor(midi / 12) - 1;
+    return {
+      name: NOTE_NAMES_FLAT[noteIdx],
+      midi,
+      freq: NOTE_FREQS[NOTE_NAMES[noteIdx] + octave]?.freq || 440 * Math.pow(2, (midi - 69) / 12),
+    };
+  });
+  // Add octave doubling for richness (one octave up, lower gain)
+  const doubled = notes.map(n => ({
+    name: n.name,
+    midi: n.midi + 12,
+    freq: n.freq * 2,
+  }));
+  return { root, type: chordType, notes, doubled, display: chordStr };
+}
+
+function getChordDisplayString(notes) {
+  return notes.map(n => n.name).join(' \u00b7 ');
+}
+
+// ---- Default drum pattern (16 steps) ----
+// Kick on 1 and 3, Snare on 2 and 4, Hats on 8ths
+const DEFAULT_PATTERN = {
+  kick:  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+  snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+  hat:   [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+};
+
+// ---- Global State ----
+const state = {
+  audioCtx: null,
+  masterGain: null,
+  drumGain: null,
+  drumVol: 0.8,
+  padPan: 0,
+  drumPan: 0,
+  padPanner: null,
+  drumPanner: null,
+  isPlaying: false,
+  bpm: 110,
+  currentStep: 0,
+  schedulerId: null,
+  nextNoteTime: 0,
+  lookAhead: 25.0, // ms
+  scheduleAheadTime: 0.1, // seconds
+  padActive: false,
+  // Pad settings
+  attack: 0.3,
+  decay: 0.5,
+  sustain: 0.5,
+  release: 1.0,
+  cutoff: 2000,
+  padVol: 0.6,
+  padSound: 'strings',
+  timeSig: '4/4',
+  continuousPad: false,
+  continuousVoices: [],
+  // Drum pattern
+  pattern: JSON.parse(JSON.stringify(DEFAULT_PATTERN)),
+  // Chord
+  chord: parseChord('C'),
+  octave: 3,
+};
+
+const OCTAVE_MIN = 1;
+const OCTAVE_MAX = 5;
+
+// ---- Drum voices ----
+function createKick(ctx, time, dest) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.frequency.setValueAtTime(150, time);
+  osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.15);
+  gain.gain.setValueAtTime(0.001, time);
+  gain.gain.exponentialRampToValueAtTime(0.8, time + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+  osc.start(time);
+  osc.stop(time + 0.2);
+}
+
+function createSnare(ctx, time, dest) {
+  // Noise burst
+  const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = noiseBuffer;
+  const noiseFilter = ctx.createBiquadFilter();
+  noiseFilter.type = 'highpass';
+  noiseFilter.frequency.value = 1500;
+  const noiseGain = ctx.createGain();
+  noise.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(dest);
+  noiseGain.gain.setValueAtTime(0.001, time);
+  noiseGain.gain.exponentialRampToValueAtTime(0.5, time + 0.002);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+  noise.start(time);
+  noise.stop(time + 0.2);
+  // Tone component
+  const tone = ctx.createOscillator();
+  const toneGain = ctx.createGain();
+  tone.type = 'triangle';
+  tone.frequency.setValueAtTime(180, time);
+  tone.frequency.exponentialRampToValueAtTime(100, time + 0.1);
+  tone.connect(toneGain);
+  toneGain.connect(dest);
+  toneGain.gain.setValueAtTime(0.001, time);
+  toneGain.gain.exponentialRampToValueAtTime(0.3, time + 0.002);
+  toneGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+  tone.start(time);
+  tone.stop(time + 0.15);
+}
+
+function createHat(ctx, time, dest) {
+  const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = noiseBuffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = 7000;
+  const gain = ctx.createGain();
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+  gain.gain.setValueAtTime(0.001, time);
+  gain.gain.exponentialRampToValueAtTime(0.15, time + 0.001);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+  noise.start(time);
+  noise.stop(time + 0.05);
+}
+
+// ---- Pad voice ----
+function createPadVoice(ctx, time, freq, duration, settings, dest) {
+  const { attack, decay, sustain, release, cutoff, padVol, sound } = settings;
+  const preset = PAD_SOUNDS[sound] || PAD_SOUNDS.strings;
+  // Multiple detuned oscillators for richness
+  const oscillators = [];
+  const detuneAmounts = preset.detune;
+  const padGain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(cutoff, time);
+  filter.Q.value = 0.7;
+
+  padGain.gain.setValueAtTime(0.001, time);
+  // Attack
+  const peakVol = Math.max(0.001, padVol);
+  padGain.gain.exponentialRampToValueAtTime(peakVol, time + Math.max(0.001, attack));
+  // Decay to sustain level
+  padGain.gain.exponentialRampToValueAtTime(
+    Math.max(0.001, peakVol * sustain),
+    time + attack + Math.max(0.001, decay)
+  );
+
+  // Sustain until release
+  const sustainEnd = time + duration;
+  padGain.gain.setValueAtTime(Math.max(0.001, peakVol * sustain), sustainEnd);
+  // Release
+  padGain.gain.exponentialRampToValueAtTime(0.001, sustainEnd + Math.max(0.001, release));
+
+  padGain.connect(filter);
+  filter.connect(dest);
+
+  detuneAmounts.forEach((cents, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = preset.typeFor(i);
+    osc.frequency.value = freq;
+    osc.detune.value = cents;
+    gain.gain.value = preset.gainFor(i);
+    osc.connect(gain);
+    gain.connect(padGain);
+    osc.start(time);
+    osc.stop(sustainEnd + release + 0.1);
+    oscillators.push(osc);
+  });
+
+  return { oscillators, padGain, filter };
+}
+
+// ---- Continuous (drone) pad mode ----
+// Instead of retriggering the pad every bar, hold a long-sustained voice
+// per note until the user stops playback, disables continuous mode, or
+// changes the chord/octave/sound (which crossfades to the new settings).
+const CROSSFADE_TIME = 0.9; // seconds of overlap when swapping chords/sounds
+
+function createContinuousVoiceSet(attackOverride) {
+  const ctx = state.audioCtx;
+  const time = ctx.currentTime + 0.02;
+  const attack = attackOverride !== undefined ? attackOverride : state.attack;
+  const baseSettings = {
+    attack,
+    decay: state.decay,
+    sustain: 0.5,
+    release: state.release,
+    cutoff: state.cutoff,
+    padVol: state.padVol,
+    sound: state.padSound,
+  };
+  const voices = [];
+  const veryLong = 1e6; // effectively "until stopped"
+
+  state.chord.notes.forEach(note => {
+    const voice = createPadVoice(ctx, time, note.freq, veryLong, baseSettings, state.padPanner);
+    voice.volScale = 1;
+    voices.push(voice);
+  });
+  state.chord.doubled.forEach(note => {
+    const subSettings = { ...baseSettings, padVol: baseSettings.padVol * 0.3 };
+    const voice = createPadVoice(ctx, time, note.freq, veryLong, subSettings, state.padPanner);
+    voice.volScale = 0.3;
+    voices.push(voice);
+  });
+  return voices;
+}
+
+// Fades out a specific set of voices over `releaseTime` and stops their
+// oscillators afterward. Does not touch state.continuousVoices itself,
+// so it can be used on an "old" set while a "new" set is already current.
+function releaseVoiceSet(voices, releaseTime) {
+  if (!voices || !voices.length || !state.audioCtx) return;
+  const ctx = state.audioCtx;
+  const now = ctx.currentTime;
+  const release = releaseTime !== undefined ? releaseTime : Math.max(0.05, state.release);
+
+  voices.forEach(voice => {
+    try {
+      const g = voice.padGain.gain;
+      const currentVal = Math.max(0.0001, g.value);
+      g.cancelScheduledValues(now);
+      g.setValueAtTime(currentVal, now);
+      g.exponentialRampToValueAtTime(0.0001, now + release);
+    } catch (e) { /* voice already stopped */ }
+    voice.oscillators.forEach(osc => {
+      try { osc.stop(now + release + 0.05); } catch (e) { /* already stopped */ }
+    });
+  });
+}
+
+function startContinuousPad() {
+  if (!state.continuousPad || !state.isPlaying || !state.audioCtx) return;
+  releaseVoiceSet(state.continuousVoices, 0.05); // clear any previous voices instantly
+  state.continuousVoices = createContinuousVoiceSet();
+  document.getElementById('padVisual').classList.add('active');
+  state.padActive = true;
+}
+
+function stopContinuousPad(forceRelease) {
+  releaseVoiceSet(state.continuousVoices, forceRelease);
+  state.continuousVoices = [];
+  document.getElementById('padVisual').classList.remove('active');
+  state.padActive = false;
+}
+
+// Live-tweak cutoff/volume on the currently sustaining continuous voices
+// (attack/decay/release only matter at note-on, so they aren't re-applied here)
+function updateContinuousLiveParams() {
+  if (!state.continuousVoices.length || !state.audioCtx) return;
+  const now = state.audioCtx.currentTime;
+  state.continuousVoices.forEach(voice => {
+    try {
+      voice.filter.frequency.setTargetAtTime(state.cutoff, now, 0.01);
+      voice.padGain.gain.setTargetAtTime(Math.max(0.0001, state.padVol * voice.volScale), now, 0.01);
+    } catch (e) { /* voice already stopped */ }
+  });
+}
+
+// Crossfade to a new chord/octave/sound: start the new voice set right
+// away (with a slightly longer fade-in so it doesn't pop in) while the
+// previous set fades out underneath it over CROSSFADE_TIME, so there's
+// a smooth overlap instead of a gap or hard cut.
+function crossfadeContinuousPad() {
+  if (!state.continuousPad || !state.isPlaying || !state.audioCtx) return;
+  const oldVoices = state.continuousVoices;
+  const fadeInTime = Math.max(state.attack, CROSSFADE_TIME * 0.6);
+  const newVoices = createContinuousVoiceSet(fadeInTime);
+  state.continuousVoices = newVoices;
+
+  if (oldVoices.length) {
+    releaseVoiceSet(oldVoices, CROSSFADE_TIME);
+  } else {
+    document.getElementById('padVisual').classList.add('active');
+    state.padActive = true;
+  }
+}
+
+// Called whenever chord/octave/sound change while continuous mode is
+// active and playing — crossfades rather than hard-restarting.
+function refreshContinuousPad() {
+  if (state.continuousPad && state.isPlaying) {
+    crossfadeContinuousPad();
+  }
+}
+
+// ---- Live Playback ----
+function initAudio() {
+  if (state.audioCtx) return;
+  state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  state.masterGain = state.audioCtx.createGain();
+  state.masterGain.gain.value = 0.8;
+  state.masterGain.connect(state.audioCtx.destination);
+
+  // Pad bus: pad voices -> padPanner -> masterGain
+  state.padPanner = state.audioCtx.createStereoPanner();
+  state.padPanner.pan.value = state.padPan;
+  state.padPanner.connect(state.masterGain);
+
+  // Drum bus: drum hits -> drumGain -> drumPanner -> masterGain
+  // (separate gain so drums can be leveled independently of the pad)
+  state.drumGain = state.audioCtx.createGain();
+  state.drumGain.gain.value = state.drumVol;
+  state.drumPanner = state.audioCtx.createStereoPanner();
+  state.drumPanner.pan.value = state.drumPan;
+  state.drumGain.connect(state.drumPanner);
+  state.drumPanner.connect(state.masterGain);
+}
+
+function startPlayback() {
+  initAudio();
+  if (state.audioCtx.state === 'suspended') {
+    state.audioCtx.resume();
+  }
+  state.isPlaying = true;
+  state.currentStep = 0;
+  state.nextNoteTime = state.audioCtx.currentTime + 0.05;
+
+  // Update UI
+  document.getElementById('playBtn').classList.add('playing');
+  document.querySelector('.icon-play').style.display = 'none';
+  document.querySelector('.icon-stop').style.display = 'block';
+
+  scheduler();
+
+  if (state.continuousPad) {
+    startContinuousPad();
+  }
+}
+
+function stopPlayback() {
+  state.isPlaying = false;
+  if (state.schedulerId) {
+    clearTimeout(state.schedulerId);
+    state.schedulerId = null;
+  }
+  if (state.continuousPad) {
+    stopContinuousPad();
+  }
+  // Update UI
+  document.getElementById('playBtn').classList.remove('playing');
+  document.querySelector('.icon-play').style.display = 'block';
+  document.querySelector('.icon-stop').style.display = 'none';
+  // Clear beat indicator
+  document.querySelectorAll('.beat-dot').forEach(d => d.classList.remove('active'));
+  // Clear current step highlight
+  document.querySelectorAll('.seq-cell.current').forEach(c => c.classList.remove('current'));
+  // Clear pad orb
+  document.getElementById('padVisual').classList.remove('active');
+  state.padActive = false;
+}
+
+function scheduler() {
+  if (!state.isPlaying) return;
+
+  const sig = getTimeSig();
+  const secondsPerBeat = 60 / state.bpm;
+  const secondsPerStep = secondsPerBeat / 4;
+
+  while (state.nextNoteTime < state.audioCtx.currentTime + state.scheduleAheadTime) {
+    const step = state.currentStep;
+    const time = state.nextNoteTime;
+    const patternStep = step % sig.steps;
+    const bar = Math.floor(step / sig.steps);
+
+    // Schedule pad at start of each bar (skipped in continuous/drone mode,
+    // where a single sustained voice is held instead of retriggering)
+    if (patternStep === 0 && !state.continuousPad) {
+      const padDuration = sig.steps * secondsPerStep;
+      const settings = {
+        attack: state.attack,
+        decay: state.decay,
+        sustain: 0.5,
+        release: state.release,
+        cutoff: state.cutoff,
+        padVol: state.padVol,
+        sound: state.padSound,
+      };
+      state.chord.notes.forEach(note => {
+        createPadVoice(state.audioCtx, time, note.freq, padDuration, settings, state.padPanner);
+      });
+      state.chord.doubled.forEach(note => {
+        const subSettings = { ...settings, padVol: settings.padVol * 0.3 };
+        createPadVoice(state.audioCtx, time, note.freq, padDuration, subSettings, state.padPanner);
+      });
+
+      // Visual: activate pad orb
+      setTimeout(() => {
+        document.getElementById('padVisual').classList.add('active');
+        state.padActive = true;
+        setTimeout(() => {
+          if (state.padActive) {
+            document.getElementById('padVisual').classList.remove('active');
+            state.padActive = false;
+          }
+        }, padDuration * 1000 * 0.8);
+      }, Math.max(0, (time - state.audioCtx.currentTime) * 1000));
+    }
+
+    // Schedule drums
+    if (state.pattern.kick[patternStep]) {
+      createKick(state.audioCtx, time, state.drumGain);
+    }
+    if (state.pattern.snare[patternStep]) {
+      createSnare(state.audioCtx, time, state.drumGain);
+    }
+    if (state.pattern.hat[patternStep]) {
+      createHat(state.audioCtx, time, state.drumGain);
+    }
+
+    // Visual step indicator (schedule for the right time)
+    const visualDelay = Math.max(0, (time - state.audioCtx.currentTime) * 1000);
+    setTimeout(() => updateVisualStep(step), visualDelay);
+
+    state.nextNoteTime += secondsPerStep;
+    state.currentStep++;
+  }
+
+  state.schedulerId = setTimeout(scheduler, state.lookAhead);
+}
+
+function renderBeatIndicator() {
+  const container = document.getElementById('beatIndicator');
+  const sig = getTimeSig();
+  container.innerHTML = '';
+  for (let i = 0; i < sig.beats; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'beat-dot' + (i === 0 ? ' active' : '');
+    dot.dataset.beat = i;
+    container.appendChild(dot);
+  }
+}
+
+function updateVisualStep(step) {
+  if (!state.isPlaying) return;
+  const sig = getTimeSig();
+  const patternStep = step % sig.steps;
+  const beat = Math.floor(patternStep / sig.stepsPerBeat);
+
+  // Update beat dots
+  document.querySelectorAll('.beat-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === beat);
+  });
+
+  // Update sequencer current step
+  document.querySelectorAll('.seq-cell.current').forEach(c => c.classList.remove('current'));
+  ['kick', 'snare', 'hat'].forEach(track => {
+    const cells = document.querySelectorAll(`.seq-cell[data-track="${track}"]`);
+    cells[patternStep]?.classList.add('current');
+  });
+}
+
+// ---- Sequencer UI ----
+function buildSequencer() {
+  const grid = document.getElementById('sequencerGrid');
+  grid.innerHTML = '';
+  const tracks = ['kick', 'snare', 'hat'];
+  const sig = getTimeSig();
+
+  tracks.forEach(track => {
+    const row = document.createElement('div');
+    row.className = 'seq-row';
+    row.style.gridTemplateColumns = `var(--seq-label-width, 80px) repeat(${sig.steps}, minmax(0, 1fr))`;
+
+    const label = document.createElement('div');
+    label.className = 'seq-label';
+    label.textContent = track;
+    row.appendChild(label);
+
+    for (let step = 0; step < sig.steps; step++) {
+      const cell = document.createElement('div');
+      cell.className = `seq-cell ${track}`;
+      cell.dataset.track = track;
+      cell.dataset.step = step;
+      if (step % sig.stepsPerBeat === 0) cell.classList.add('beat-start');
+      if (state.pattern[track][step]) cell.classList.add('active', track);
+
+      cell.addEventListener('click', () => {
+        state.pattern[track][step] = state.pattern[track][step] ? 0 : 1;
+        cell.classList.toggle('active');
+      });
+
+      row.appendChild(cell);
+    }
+    grid.appendChild(row);
+  });
+}
+
+function updateSequencerVisuals() {
+  ['kick', 'snare', 'hat'].forEach(track => {
+    const cells = document.querySelectorAll(`.seq-cell[data-track="${track}"]`);
+    cells.forEach((cell, step) => {
+      cell.classList.toggle('active', !!state.pattern[track][step]);
+    });
+  });
+}
+
+// ---- Chord selector data ----
+const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const CHORD_GROUPS = [
+  { label: 'Triads', types: [
+    { value: '', label: 'Major' },
+    { value: 'm', label: 'Minor' },
+    { value: 'sus4', label: 'Sus 4' },
+    { value: 'sus2', label: 'Sus 2' },
+    { value: 'dim', label: 'Diminished' },
+    { value: 'aug', label: 'Augmented' },
+  ]},
+  { label: '6th', types: [
+    { value: '6', label: 'Major 6' },
+    { value: 'm6', label: 'Minor 6' },
+    { value: '6/9', label: '6/9' },
+  ]},
+  { label: '7th', types: [
+    { value: '7', label: 'Dominant 7' },
+    { value: 'maj7', label: 'Major 7' },
+    { value: 'm7', label: 'Minor 7' },
+    { value: '7b5', label: '7b5' },
+    { value: '7#5', label: '7#5' },
+    { value: 'dim7', label: 'Diminished 7' },
+    { value: 'aug7', label: 'Augmented 7' },
+  ]},
+  { label: '9th', types: [
+    { value: '9', label: 'Dominant 9' },
+    { value: 'maj9', label: 'Major 9' },
+    { value: 'm9', label: 'Minor 9' },
+    { value: '7b9', label: '7b9' },
+    { value: '7#9', label: '7#9' },
+    { value: 'add9', label: 'Add 9' },
+    { value: 'madd9', label: 'Minor Add 9' },
+  ]},
+  { label: 'Extended', types: [
+    { value: '11', label: '11th' },
+    { value: 'm11', label: 'Minor 11th' },
+    { value: '13', label: '13th' },
+    { value: 'm13', label: 'Minor 13th' },
+  ]},
+];
+
+// Current selection state
+// chordSelection.root/type is the chord currently sounding.
+// currentKey is the stable tonal center used by the Circle of Fifths and
+// Nashville Numbers panels — it only changes via the Key button or the
+// Circle of Fifths, never when picking a Nashville number.
+const chordSelection = { root: 'C', type: '' };
+let currentKey = chordSelection.root;
+
+// Flattened value -> label lookup (e.g. 'm' -> 'Minor'), reused wherever
+// we need to set the Chord button's text without duplicating labels
+const CHORD_TYPE_LABELS = {};
+CHORD_GROUPS.forEach(group => {
+  group.types.forEach(t => { CHORD_TYPE_LABELS[t.value] = t.label; });
+});
+
+// ---- Circle of Fifths data ----
+// Clockwise from the top: C, G, D, A, E, B, F#, C#, G#, D#, A#, F
+const CIRCLE_OF_FIFTHS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+
+// ---- Nashville Number System data ----
+// Diatonic triads of a major scale, by semitone offset from the root
+const NASHVILLE_DEGREES = [
+  { semitones: 0, number: '1', type: '' },
+  { semitones: 2, number: '2m', type: 'm' },
+  { semitones: 4, number: '3m', type: 'm' },
+  { semitones: 5, number: '4', type: '' },
+  { semitones: 7, number: '5', type: '' },
+  { semitones: 9, number: '6m', type: 'm' },
+  { semitones: 11, number: '7\u00b0', type: 'dim' },
+];
+
+// ---- Custom picker modal ----
+let pickerOverlay = null;
+
+function openRootPicker() {
+  closePicker();
+  const overlay = document.createElement('div');
+  overlay.className = 'picker-overlay';
+  overlay.innerHTML = '';
+  const modal = document.createElement('div');
+  modal.className = 'picker-modal';
+  modal.innerHTML = '<div class="picker-title">Select Key</div>';
+  const grid = document.createElement('div');
+  grid.className = 'picker-grid';
+  ROOT_NOTES.forEach(root => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'picker-option' + (root === currentKey ? ' selected' : '');
+    btn.textContent = root;
+    btn.addEventListener('click', () => {
+      currentKey = root;
+      chordSelection.root = root;
+      document.getElementById('rootBtn').textContent = currentKey;
+      updateChordDisplay();
+      closePicker();
+    });
+    grid.appendChild(btn);
+  });
+  modal.appendChild(grid);
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'picker-close';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', closePicker);
+  modal.appendChild(closeBtn);
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closePicker(); });
+  document.body.appendChild(overlay);
+  pickerOverlay = overlay;
+  document.getElementById('rootBtn').classList.add('open');
+}
+
+function openTypePicker() {
+  closePicker();
+  const overlay = document.createElement('div');
+  overlay.className = 'picker-overlay';
+  const modal = document.createElement('div');
+  modal.className = 'picker-modal';
+  modal.innerHTML = '<div class="picker-title">Select Chord Type</div>';
+  CHORD_GROUPS.forEach(group => {
+    const label = document.createElement('div');
+    label.className = 'picker-group-label';
+    label.textContent = group.label;
+    modal.appendChild(label);
+    const list = document.createElement('div');
+    list.className = 'picker-list';
+    group.types.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'picker-option' + (t.value === chordSelection.type ? ' selected' : '');
+      btn.textContent = t.label;
+      btn.addEventListener('click', () => {
+        chordSelection.type = t.value;
+        document.getElementById('typeBtn').textContent = t.label;
+        updateChordDisplay();
+        closePicker();
+      });
+      list.appendChild(btn);
+    });
+    modal.appendChild(list);
+  });
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'picker-close';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', closePicker);
+  modal.appendChild(closeBtn);
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closePicker(); });
+  document.body.appendChild(overlay);
+  pickerOverlay = overlay;
+  document.getElementById('typeBtn').classList.add('open');
+}
+
+// ---- Time signature ----
+// Resizes the current pattern to fit a new step count, preserving as much
+// of the existing pattern as fits (padding with silence, or truncating)
+function resizePattern(newSteps) {
+  ['kick', 'snare', 'hat'].forEach(track => {
+    const old = state.pattern[track];
+    const next = Array(newSteps).fill(0);
+    for (let i = 0; i < Math.min(old.length, newSteps); i++) {
+      next[i] = old[i];
+    }
+    state.pattern[track] = next;
+  });
+}
+
+function changeTimeSignature(newSig) {
+  if (newSig === state.timeSig) return;
+  state.timeSig = newSig;
+  const sig = getTimeSig();
+  resizePattern(sig.steps);
+  document.getElementById('timeSigBtn').textContent = sig.label;
+  buildSequencer();
+  renderBeatIndicator();
+}
+
+function openTimeSigPicker() {
+  closePicker();
+  const overlay = document.createElement('div');
+  overlay.className = 'picker-overlay';
+  const modal = document.createElement('div');
+  modal.className = 'picker-modal';
+  modal.innerHTML = '<div class="picker-title">Select Time Signature</div>';
+  const list = document.createElement('div');
+  list.className = 'picker-list';
+  Object.entries(TIME_SIGNATURES).forEach(([key, sig]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'picker-option' + (key === state.timeSig ? ' selected' : '');
+    btn.textContent = sig.label;
+    btn.addEventListener('click', () => {
+      changeTimeSignature(key);
+      closePicker();
+    });
+    list.appendChild(btn);
+  });
+  modal.appendChild(list);
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'picker-close';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', closePicker);
+  modal.appendChild(closeBtn);
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closePicker(); });
+  document.body.appendChild(overlay);
+  pickerOverlay = overlay;
+  document.getElementById('timeSigBtn').classList.add('open');
+}
+
+function openSoundPicker() {
+  closePicker();
+  const overlay = document.createElement('div');
+  overlay.className = 'picker-overlay';
+  const modal = document.createElement('div');
+  modal.className = 'picker-modal';
+  modal.innerHTML = '<div class="picker-title">Select Pad Sound</div>';
+  const list = document.createElement('div');
+  list.className = 'picker-list';
+  Object.entries(PAD_SOUNDS).forEach(([key, preset]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'picker-option' + (key === state.padSound ? ' selected' : '');
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      state.padSound = key;
+      document.getElementById('soundBtn').textContent = preset.label;
+      refreshContinuousPad();
+      closePicker();
+    });
+    list.appendChild(btn);
+  });
+  modal.appendChild(list);
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'picker-close';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', closePicker);
+  modal.appendChild(closeBtn);
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closePicker(); });
+  document.body.appendChild(overlay);
+  pickerOverlay = overlay;
+  document.getElementById('soundBtn').classList.add('open');
+}
+
+function closePicker() {
+  if (pickerOverlay) {
+    pickerOverlay.remove();
+    pickerOverlay = null;
+  }
+  document.getElementById('rootBtn')?.classList.remove('open');
+  document.getElementById('typeBtn')?.classList.remove('open');
+  document.getElementById('soundBtn')?.classList.remove('open');
+  document.getElementById('timeSigBtn')?.classList.remove('open');
+}
+
+// ---- Chord display ----
+function updateChordDisplay() {
+  const chordStr = chordSelection.root + chordSelection.type;
+  state.chord = parseChord(chordStr, state.octave);
+  document.getElementById('chordNameDisplay').textContent = chordStr;
+  document.getElementById('chordNotesDisplay').innerHTML =
+    getChordDisplayString(state.chord.notes);
+  refreshContinuousPad();
+  renderCircleOfFifths();
+  renderNashvilleGrid();
+}
+
+// ---- Circle of Fifths ----
+function renderCircleOfFifths() {
+  const container = document.getElementById('cofWheel');
+  if (!container) return;
+  const size = 240;
+  const cx = size / 2;
+  const cy = size / 2;
+  const majorRadius = 96;
+  const majorNoteRadius = 18;
+  const minorRadius = 58;
+  const minorNoteRadius = 15;
+
+  let svg = `<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">`;
+  CIRCLE_OF_FIFTHS.forEach((note, i) => {
+    const angle = (i * 30 - 90) * (Math.PI / 180);
+    const relMinor = NOTE_NAMES[(NOTE_NAMES.indexOf(note) + 9) % 12];
+
+    // Outer ring: major keys — these set the tonal key
+    const mx = cx + majorRadius * Math.cos(angle);
+    const my = cy + majorRadius * Math.sin(angle);
+    const majorSelected = note === currentKey;
+    svg += `<g class="cof-note cof-major${majorSelected ? ' selected' : ''}" data-note="${note}" data-quality="">
+      <circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${majorNoteRadius}"></circle>
+      <text x="${mx.toFixed(1)}" y="${my.toFixed(1)}">${note}</text>
+    </g>`;
+
+    // Inner ring: relative minors — these only change the sounding chord
+    const ix = cx + minorRadius * Math.cos(angle);
+    const iy = cy + minorRadius * Math.sin(angle);
+    const minorSelected = relMinor === chordSelection.root && chordSelection.type === 'm';
+    svg += `<g class="cof-note cof-minor${minorSelected ? ' selected' : ''}" data-note="${relMinor}" data-quality="m">
+      <circle cx="${ix.toFixed(1)}" cy="${iy.toFixed(1)}" r="${minorNoteRadius}"></circle>
+      <text x="${ix.toFixed(1)}" y="${iy.toFixed(1)}">${relMinor}m</text>
+    </g>`;
+  });
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  container.querySelectorAll('.cof-major').forEach(el => {
+    el.addEventListener('click', () => {
+      const note = el.getAttribute('data-note');
+      currentKey = note;
+      chordSelection.root = note;
+      document.getElementById('rootBtn').textContent = currentKey;
+      updateChordDisplay();
+    });
+  });
+
+  container.querySelectorAll('.cof-minor').forEach(el => {
+    el.addEventListener('click', () => {
+      // Relative minors share the same key signature as their major, so
+      // this changes only the sounding chord — the key stays put, just
+      // like picking a chord from the Nashville Numbers panel
+      const note = el.getAttribute('data-note');
+      chordSelection.root = note;
+      chordSelection.type = 'm';
+      document.getElementById('typeBtn').textContent = CHORD_TYPE_LABELS['m'] || 'Minor';
+      updateChordDisplay();
+    });
+  });
+}
+
+// ---- Nashville Number System ----
+function renderNashvilleGrid() {
+  const grid = document.getElementById('nashvilleGrid');
+  if (!grid) return;
+  const rootIdx = NOTE_NAMES.indexOf(currentKey);
+  document.getElementById('nashvilleKeyLabel').textContent = currentKey;
+
+  grid.innerHTML = '';
+  NASHVILLE_DEGREES.forEach(degree => {
+    const noteIdx = (rootIdx + degree.semitones) % 12;
+    const noteName = NOTE_NAMES[noteIdx];
+    const isSelected = noteName === chordSelection.root && degree.type === chordSelection.type;
+
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'nashville-chip' + (isSelected ? ' selected' : '');
+    chip.innerHTML = `
+      <span class="nashville-number">${degree.number}</span>
+      <span class="nashville-chord-name">${noteName}${degree.type}</span>
+    `;
+    chip.addEventListener('click', () => {
+      // Changes only the sounding chord — the key (rootBtn, Circle of
+      // Fifths highlight) stays put so the Nashville numbers keep making
+      // sense relative to the same key
+      chordSelection.root = noteName;
+      chordSelection.type = degree.type;
+      document.getElementById('typeBtn').textContent = CHORD_TYPE_LABELS[degree.type] || 'Major';
+      updateChordDisplay();
+    });
+    grid.appendChild(chip);
+  });
+}
+
+// ---- Octave stepper ----
+function updateOctaveDisplay() {
+  document.getElementById('octaveValue').textContent = state.octave;
+  document.getElementById('octaveDown').disabled = state.octave <= OCTAVE_MIN;
+  document.getElementById('octaveUp').disabled = state.octave >= OCTAVE_MAX;
+}
+
+function changeOctave(delta) {
+  const next = Math.min(OCTAVE_MAX, Math.max(OCTAVE_MIN, state.octave + delta));
+  if (next === state.octave) return;
+  state.octave = next;
+  updateOctaveDisplay();
+  updateChordDisplay();
+}
+
+// ---- Parameter bindings ----
+function bindSlider(id, valueId, formatter, callback) {
+  const slider = document.getElementById(id);
+  const valueEl = document.getElementById(valueId);
+  const update = () => {
+    const v = parseFloat(slider.value);
+    valueEl.textContent = formatter(v);
+    callback(v);
+  };
+  slider.addEventListener('input', update);
+  update();
+}
+
+// ---- Theme toggle ----
+(function () {
+  const t = document.querySelector('[data-theme-toggle]');
+  const r = document.documentElement;
+  let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  r.setAttribute('data-theme', d);
+  const updateIcon = () => {
+    t.innerHTML = d === 'dark'
+      ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
+  };
+  updateIcon();
+  t.addEventListener('click', () => {
+    d = d === 'dark' ? 'light' : 'dark';
+    r.setAttribute('data-theme', d);
+    updateIcon();
+  });
+})();
+
+// ---- Init ----
+document.addEventListener('DOMContentLoaded', () => {
+  // Build sequencer
+  buildSequencer();
+  renderBeatIndicator();
+
+  // Time signature
+  document.getElementById('timeSigBtn').addEventListener('click', openTimeSigPicker);
+
+  // Play/Stop
+  document.getElementById('playBtn').addEventListener('click', () => {
+    if (state.isPlaying) {
+      stopPlayback();
+    } else {
+      startPlayback();
+    }
+  });
+
+  // BPM
+  const bpmSlider = document.getElementById('bpmSlider');
+  const bpmValue = document.getElementById('bpmValue');
+  bpmSlider.addEventListener('input', () => {
+    state.bpm = parseInt(bpmSlider.value);
+    bpmValue.textContent = state.bpm;
+  });
+
+  // Chord selector — custom button-based pickers
+  document.getElementById('rootBtn').addEventListener('click', openRootPicker);
+  document.getElementById('typeBtn').addEventListener('click', openTypePicker);
+  document.getElementById('soundBtn').addEventListener('click', openSoundPicker);
+  updateChordDisplay();
+
+  // Octave stepper
+  document.getElementById('octaveDown').addEventListener('click', () => changeOctave(-1));
+  document.getElementById('octaveUp').addEventListener('click', () => changeOctave(1));
+  updateOctaveDisplay();
+
+  // Continuous (drone) pad toggle
+  document.getElementById('continuousToggle').addEventListener('change', (e) => {
+    state.continuousPad = e.target.checked;
+    if (state.isPlaying) {
+      if (state.continuousPad) {
+        startContinuousPad();
+      } else {
+        stopContinuousPad();
+      }
+    }
+  });
+
+  // Pad ADSR
+  bindSlider('attackSlider', 'attackValue', v => v.toFixed(2) + 's', v => state.attack = v);
+  bindSlider('decaySlider', 'decayValue', v => v.toFixed(2) + 's', v => state.decay = v);
+  bindSlider('releaseSlider', 'releaseValue', v => v.toFixed(2) + 's', v => state.release = v);
+  bindSlider('cutoffSlider', 'cutoffValue', v => Math.round(v) + 'Hz', v => { state.cutoff = v; updateContinuousLiveParams(); });
+
+  // Mixer: volume faders + pan
+  bindSlider('padVolFader', 'padVolFaderValue', v => Math.round(v * 100) + '%', v => { state.padVol = v; updateContinuousLiveParams(); });
+  bindSlider('drumVolFader', 'drumVolFaderValue', v => Math.round(v * 100) + '%', v => {
+    state.drumVol = v;
+    if (state.drumGain) {
+      state.drumGain.gain.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+  bindSlider('padPanSlider', 'padPanValue', formatPan, v => {
+    state.padPan = v;
+    if (state.padPanner) {
+      state.padPanner.pan.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+  bindSlider('drumPanSlider', 'drumPanValue', formatPan, v => {
+    state.drumPan = v;
+    if (state.drumPanner) {
+      state.drumPanner.pan.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+
+  // Sequencer actions
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    const sig = getTimeSig();
+    state.pattern = { kick: Array(sig.steps).fill(0), snare: Array(sig.steps).fill(0), hat: Array(sig.steps).fill(0) };
+    updateSequencerVisuals();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    const sig = getTimeSig();
+    state.pattern = state.timeSig === '4/4'
+      ? JSON.parse(JSON.stringify(DEFAULT_PATTERN))
+      : generateDefaultPattern(sig);
+    updateSequencerVisuals();
+  });
+
+  // Export removed per user request
+
+  // Keyboard shortcut: spacebar
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT') {
+      e.preventDefault();
+      if (state.isPlaying) {
+        stopPlayback();
+      } else {
+        startPlayback();
+      }
+    }
+  });
+});
+
+</script>
+</body>
+</html>
