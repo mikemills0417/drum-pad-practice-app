@@ -193,10 +193,6 @@ body {
   background: var(--color-surface-2);
 }
 
-.theme-toggle:hover {
-  color: var(--color-text);
-  border-color: var(--color-primary);
-}
 
 /* Main */
 .app-main {
@@ -277,10 +273,6 @@ body {
   flex-shrink: 0;
 }
 
-.btn-play:hover {
-  background: var(--color-primary-hover);
-  transform: scale(1.05);
-}
 
 .btn-play:active {
   transform: scale(0.95);
@@ -650,10 +642,6 @@ body {
   opacity: 0.5;
 }
 
-.chord-pick:hover {
-  border-color: var(--color-primary);
-  background: var(--color-surface-offset);
-}
 
 .chord-pick:active {
   transform: scale(0.96);
@@ -693,10 +681,6 @@ body {
   touch-action: manipulation;
 }
 
-.octave-btn:hover:not(:disabled) {
-  color: var(--color-primary);
-  background: var(--color-surface-offset);
-}
 
 .octave-btn:active:not(:disabled) {
   transform: scale(0.9);
@@ -805,9 +789,6 @@ body {
   user-select: none;
 }
 
-.picker-option:hover {
-  border-color: var(--color-primary);
-}
 
 .picker-option:active {
   transform: scale(0.96);
@@ -836,9 +817,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.picker-close:hover {
-  border-color: var(--color-primary);
-}
 
 /* ============================================
    Drum Sequencer
@@ -930,10 +908,6 @@ body {
   border: 1px solid var(--color-border);
 }
 
-.btn-small:hover {
-  color: var(--color-text);
-  border-color: var(--color-primary);
-}
 
 .sequencer-grid {
   display: grid;
@@ -959,18 +933,14 @@ body {
 }
 
 .seq-cell {
-  aspect-ratio: 1;
+  height: 28px;
   border-radius: var(--radius-sm);
   background: var(--color-surface-2);
   border: 1px solid var(--color-divider);
   cursor: pointer;
   transition: all 100ms ease;
-  min-height: 28px;
 }
 
-.seq-cell:hover {
-  border-color: var(--color-border-light);
-}
 
 .seq-cell.beat-start {
   border-left: 2px solid var(--color-border);
@@ -1074,9 +1044,6 @@ body {
   fill: var(--color-text-faint);
 }
 
-.cof-note:hover circle {
-  stroke: var(--color-border-light);
-}
 
 .cof-note.selected circle {
   fill: var(--color-primary-highlight);
@@ -1128,9 +1095,6 @@ body {
   border: 1px solid var(--color-border);
 }
 
-.nashville-chip:hover {
-  border-color: var(--color-border-light);
-}
 
 .nashville-chip.selected {
   background: var(--color-primary-highlight);
@@ -1168,15 +1132,79 @@ body {
     font-size: var(--text-base);
   }
   .seq-row {
-    --seq-label-width: 56px;
+    --seq-label-width: 52px;
     gap: 2px;
   }
   .seq-label {
     font-size: 10px;
   }
   .seq-cell {
-    min-height: 22px;
+    height: 24px;
   }
+}
+
+@media (max-width: 380px) {
+  .seq-row {
+    --seq-label-width: 40px;
+    gap: 1.5px;
+  }
+  .seq-cell {
+    height: 22px;
+    border-radius: 3px;
+  }
+}
+
+/* ============================================
+   Hover states — only for devices with real hover
+   (prevents "sticky hover" on touchscreens, where a
+   tapped element can visually stay highlighted)
+   ============================================ */
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover {
+    color: var(--color-text);
+    border-color: var(--color-primary);
+  }
+
+  .btn-play:hover {
+    background: var(--color-primary-hover);
+    transform: scale(1.05);
+  }
+
+  .chord-pick:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface-offset);
+  }
+
+  .octave-btn:hover:not(:disabled) {
+    color: var(--color-primary);
+    background: var(--color-surface-offset);
+  }
+
+  .picker-option:hover {
+    border-color: var(--color-primary);
+  }
+
+  .picker-close:hover {
+    border-color: var(--color-primary);
+  }
+
+  .btn-small:hover {
+    color: var(--color-text);
+    border-color: var(--color-primary);
+  }
+
+  .seq-cell:hover {
+    border-color: var(--color-border-light);
+  }
+
+  .cof-note:hover circle {
+    stroke: var(--color-border-light);
+  }
+
+  .nashville-chip:hover {
+    border-color: var(--color-border-light);
+  }
+
 }
 
 </style>
@@ -1454,22 +1482,33 @@ function getTimeSig() {
 
 // Generic default pattern for any time signature: kick on beat 1 and the
 // midpoint beat, snare on alternating beats, hat on a steady subdivision
-function generateDefaultPattern(sig) {
-  const { steps, beats, stepsPerBeat } = sig;
-  const kick = Array(steps).fill(0);
-  const snare = Array(steps).fill(0);
-  const hat = Array(steps).fill(0);
-  kick[0] = 1;
-  kick[Math.floor(beats / 2) * stepsPerBeat] = 1;
-  for (let b = 1; b < beats; b += 2) {
-    snare[b * stepsPerBeat] = 1;
-  }
-  const hatInterval = stepsPerBeat >= 2 ? Math.floor(stepsPerBeat / 2) : 1;
-  for (let s = 0; s < steps; s += hatInterval) {
-    hat[s] = 1;
-  }
-  return { kick, snare, hat };
-}
+// Hand-tailored default grooves per time signature. A generic formula
+// (kick on beat 1 + midpoint, snare on odd beats) sounds simple but
+// actually lands kick and snare on the same step for 3/4, 6/8, and 7/8 —
+// so instead each meter gets an explicit, verified-non-colliding pattern.
+const TIME_SIG_DEFAULTS = {
+  '3/4': {
+    // Simple waltz feel
+    kick:  [1,0,0,0, 0,0,0,0, 0,0,0,0],
+    snare: [0,0,0,0, 1,0,0,0, 1,0,0,0],
+    hat:   [0,0,1,0, 0,0,1,0, 0,0,1,0],
+  },
+  '5/4': {
+    kick:  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0,0,0],
+    snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 1,0,0,0],
+    hat:   [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+  },
+  '6/8': {
+    kick:  [1,0, 0,0, 0,0, 0,0, 0,0, 0,0],
+    snare: [0,0, 0,0, 0,0, 1,0, 0,0, 0,0],
+    hat:   [1,0, 1,0, 1,0, 1,0, 1,0, 1,0],
+  },
+  '7/8': {
+    kick:  [1,0,0,0, 1,0,0,0, 0,0,0,0, 0,0],
+    snare: [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0],
+    hat:   [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0],
+  },
+};
 // Each preset controls oscillator waveform per voice + detune spread,
 // giving a distinct timbre while reusing the same ADSR/filter engine.
 const PAD_SOUNDS = {
@@ -1573,6 +1612,7 @@ const state = {
   continuousVoices: [],
   // Drum pattern
   pattern: JSON.parse(JSON.stringify(DEFAULT_PATTERN)),
+  patternsBySig: { '4/4': JSON.parse(JSON.stringify(DEFAULT_PATTERN)) },
   // Chord
   chord: parseChord('C'),
   octave: 3,
@@ -2122,7 +2162,9 @@ function openRootPicker() {
     btn.addEventListener('click', () => {
       currentKey = root;
       chordSelection.root = root;
+      chordSelection.type = '';
       document.getElementById('rootBtn').textContent = currentKey;
+      document.getElementById('typeBtn').textContent = CHORD_TYPE_LABELS[''] || 'Major';
       updateChordDisplay();
       closePicker();
     });
@@ -2187,22 +2229,28 @@ function openTypePicker() {
 // ---- Time signature ----
 // Resizes the current pattern to fit a new step count, preserving as much
 // of the existing pattern as fits (padding with silence, or truncating)
-function resizePattern(newSteps) {
-  ['kick', 'snare', 'hat'].forEach(track => {
-    const old = state.pattern[track];
-    const next = Array(newSteps).fill(0);
-    for (let i = 0; i < Math.min(old.length, newSteps); i++) {
-      next[i] = old[i];
-    }
-    state.pattern[track] = next;
-  });
-}
-
 function changeTimeSignature(newSig) {
   if (newSig === state.timeSig) return;
+
+  // Remember the pattern we're leaving so it's still there if the user
+  // switches back to this signature later
+  state.patternsBySig[state.timeSig] = state.pattern;
+
   state.timeSig = newSig;
   const sig = getTimeSig();
-  resizePattern(sig.steps);
+
+  if (state.patternsBySig[newSig]) {
+    // Already have a pattern for this signature (visited before this
+    // session) — reuse it instead of overwriting the user's edits
+    state.pattern = state.patternsBySig[newSig];
+  } else {
+    // First time visiting this signature — start from a hand-tailored default
+    state.pattern = newSig === '4/4'
+      ? JSON.parse(JSON.stringify(DEFAULT_PATTERN))
+      : JSON.parse(JSON.stringify(TIME_SIG_DEFAULTS[newSig]));
+    state.patternsBySig[newSig] = state.pattern;
+  }
+
   document.getElementById('timeSigBtn').textContent = sig.label;
   buildSequencer();
   renderBeatIndicator();
@@ -2318,10 +2366,11 @@ function renderCircleOfFifths() {
     const angle = (i * 30 - 90) * (Math.PI / 180);
     const relMinor = NOTE_NAMES[(NOTE_NAMES.indexOf(note) + 9) % 12];
 
-    // Outer ring: major keys — these set the tonal key
+    // Outer ring: major keys — sets the tonal key. Lit only when the
+    // currently sounding chord IS this note's plain major chord.
     const mx = cx + majorRadius * Math.cos(angle);
     const my = cy + majorRadius * Math.sin(angle);
-    const majorSelected = note === currentKey;
+    const majorSelected = note === chordSelection.root && chordSelection.type === '';
     svg += `<g class="cof-note cof-major${majorSelected ? ' selected' : ''}" data-note="${note}" data-quality="">
       <circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${majorNoteRadius}"></circle>
       <text x="${mx.toFixed(1)}" y="${my.toFixed(1)}">${note}</text>
@@ -2344,7 +2393,9 @@ function renderCircleOfFifths() {
       const note = el.getAttribute('data-note');
       currentKey = note;
       chordSelection.root = note;
+      chordSelection.type = '';
       document.getElementById('rootBtn').textContent = currentKey;
+      document.getElementById('typeBtn').textContent = CHORD_TYPE_LABELS[''] || 'Major';
       updateChordDisplay();
     });
   });
@@ -2528,10 +2579,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('resetBtn').addEventListener('click', () => {
-    const sig = getTimeSig();
     state.pattern = state.timeSig === '4/4'
       ? JSON.parse(JSON.stringify(DEFAULT_PATTERN))
-      : generateDefaultPattern(sig);
+      : JSON.parse(JSON.stringify(TIME_SIG_DEFAULTS[state.timeSig]));
     updateSequencerVisuals();
   });
 
