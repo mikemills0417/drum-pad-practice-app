@@ -899,6 +899,58 @@ body {
   color: var(--color-text-muted);
 }
 
+/* Drum sub-mix: individual levels feeding the Drums group fader */
+.drum-submix {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.submix-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.submix-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.submix-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 62px;
+}
+
+.submix-row .slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.submix-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
 .btn-small {
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
@@ -1413,6 +1465,24 @@ body {
           <span class="pan-value" id="drumPanValue">C</span>
         </div>
       </div>
+      <div class="drum-submix">
+        <span class="submix-title">Drum Levels</span>
+        <div class="submix-row">
+          <span class="submix-label"><span class="dot dot-kick"></span>Kick</span>
+          <input type="range" id="kickVolSlider" min="0" max="1" step="0.01" value="0.8" class="slider" aria-label="Kick volume">
+          <span class="submix-value" id="kickVolValue">80%</span>
+        </div>
+        <div class="submix-row">
+          <span class="submix-label"><span class="dot dot-snare"></span>Snare</span>
+          <input type="range" id="snareVolSlider" min="0" max="1" step="0.01" value="0.8" class="slider" aria-label="Snare volume">
+          <span class="submix-value" id="snareVolValue">80%</span>
+        </div>
+        <div class="submix-row">
+          <span class="submix-label"><span class="dot dot-hat"></span>Hi-Hat</span>
+          <input type="range" id="hatVolSlider" min="0" max="1" step="0.01" value="0.8" class="slider" aria-label="Hi-hat volume">
+          <span class="submix-value" id="hatVolValue">80%</span>
+        </div>
+      </div>
     </section>
 
     <!-- Circle of Fifths: tap a key to change the current key -->
@@ -1623,6 +1693,15 @@ const state = {
   masterGain: null,
   drumGain: null,
   drumVol: 0.8,
+  // Per-instrument drum gains. Each drum routes through its own gain into
+  // the shared drumGain bus, so the Drums fader scales all three together
+  // while these set the balance between them.
+  kickGain: null,
+  snareGain: null,
+  hatGain: null,
+  kickVol: 0.8,
+  snareVol: 0.8,
+  hatVol: 0.8,
   padPan: 0,
   drumPan: 0,
   padPanner: null,
@@ -1943,14 +2022,27 @@ function initAudio() {
   state.padPanner.pan.value = state.padPan;
   state.padPanner.connect(state.masterGain);
 
-  // Drum bus: drum hits -> drumGain -> drumPanner -> masterGain
-  // (separate gain so drums can be leveled independently of the pad)
+  // Drum bus: each hit -> its own instrument gain -> drumGain (group)
+  // -> drumPanner -> masterGain. Chaining the gains means the group
+  // fader multiplies the per-instrument levels rather than replacing them.
   state.drumGain = state.audioCtx.createGain();
   state.drumGain.gain.value = state.drumVol;
   state.drumPanner = state.audioCtx.createStereoPanner();
   state.drumPanner.pan.value = state.drumPan;
   state.drumGain.connect(state.drumPanner);
   state.drumPanner.connect(state.masterGain);
+
+  state.kickGain = state.audioCtx.createGain();
+  state.kickGain.gain.value = state.kickVol;
+  state.kickGain.connect(state.drumGain);
+
+  state.snareGain = state.audioCtx.createGain();
+  state.snareGain.gain.value = state.snareVol;
+  state.snareGain.connect(state.drumGain);
+
+  state.hatGain = state.audioCtx.createGain();
+  state.hatGain.gain.value = state.hatVol;
+  state.hatGain.connect(state.drumGain);
 }
 
 function startPlayback() {
@@ -2049,13 +2141,13 @@ function scheduler() {
 
     // Schedule drums
     if (barPattern.kick[patternStep]) {
-      createKick(state.audioCtx, time, state.drumGain);
+      createKick(state.audioCtx, time, state.kickGain);
     }
     if (barPattern.snare[patternStep]) {
-      createSnare(state.audioCtx, time, state.drumGain);
+      createSnare(state.audioCtx, time, state.snareGain);
     }
     if (barPattern.hat[patternStep]) {
-      createHat(state.audioCtx, time, state.drumGain);
+      createHat(state.audioCtx, time, state.hatGain);
     }
 
     // Visual step indicator (schedule for the right time)
@@ -2683,6 +2775,28 @@ document.addEventListener('DOMContentLoaded', () => {
     state.drumVol = v;
     if (state.drumGain) {
       state.drumGain.gain.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+
+  // Per-drum levels. These feed the Drums group fader above, so the group
+  // fader scales whatever balance is set here.
+  const pct = v => Math.round(v * 100) + '%';
+  bindSlider('kickVolSlider', 'kickVolValue', pct, v => {
+    state.kickVol = v;
+    if (state.kickGain) {
+      state.kickGain.gain.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+  bindSlider('snareVolSlider', 'snareVolValue', pct, v => {
+    state.snareVol = v;
+    if (state.snareGain) {
+      state.snareGain.gain.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
+    }
+  });
+  bindSlider('hatVolSlider', 'hatVolValue', pct, v => {
+    state.hatVol = v;
+    if (state.hatGain) {
+      state.hatGain.gain.setTargetAtTime(v, state.audioCtx.currentTime, 0.01);
     }
   });
   bindSlider('padPanSlider', 'padPanValue', formatPan, v => {
